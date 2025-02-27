@@ -6,10 +6,32 @@ const headers = {
   Accept: "application/vnd.github.v3+json",
 };
 
-const fetchMergedPullRequests = async (owner, repo) => {
-  const url = `https://api.github.com/repos/${owner}/${repo}/pulls?state=closed`;
+const fetchMergedPullRequests = async (
+  owner,
+  repo,
+  fromDate = null,
+  toDate = null
+) => {
+  let url = `https://api.github.com/repos/${owner}/${repo}/pulls?state=closed`;
+
   const response = await axios.get(url, { headers });
-  return response.data.filter((pr) => pr.merged_at !== null);
+  let prs = response.data.filter((pr) => pr.merged_at !== null);
+
+  if (fromDate || toDate) {
+    prs = prs.filter((pr) => {
+      const mergedDate = new Date(pr.merged_at);
+      if (fromDate && toDate) {
+        return (
+          mergedDate >= new Date(fromDate) && mergedDate <= new Date(toDate)
+        );
+      } else if (fromDate) {
+        return mergedDate >= new Date(fromDate);
+      }
+      return true;
+    });
+  }
+
+  return prs;
 };
 
 const fetchCommitsForPullRequest = async (owner, repo, pullNumber) => {
@@ -24,8 +46,18 @@ const fetchCommitDetails = async (owner, repo, commitSha) => {
   return response.data;
 };
 
-const calculateChangesPerUser = async (owner, repo) => {
-  const mergedPRs = await fetchMergedPullRequests(owner, repo);
+const calculateChangesPerUser = async (
+  owner,
+  repo,
+  fromDate = null,
+  toDate = null
+) => {
+  const mergedPRs = await fetchMergedPullRequests(
+    owner,
+    repo,
+    fromDate,
+    toDate
+  );
   const userContributions = {};
 
   for (const pr of mergedPRs) {

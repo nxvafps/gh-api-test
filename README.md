@@ -7,6 +7,7 @@ This Node.js application fetches and analyzes pull request statistics from GitHu
 - Fetch merged pull requests from a repository
 - Calculate changes (additions, deletions, total) per user
 - Detailed commit analysis for each pull request
+- Filter pull requests by date range
 
 ## Prerequisites
 
@@ -50,12 +51,25 @@ This Node.js application fetches and analyzes pull request statistics from GitHu
 
 ## Usage
 
-Modify the example usage in `index.js` with your target repository details:
+Modify the example usage in `index.js` with your target repository details. You can filter pull requests by date:
 
 ```javascript
+// Get all contributions
 calculateChangesPerUser("owner", "repo").then((contributions) => {
-  console.log("Contributions per user:", contributions);
+  console.log("All time contributions:", contributions);
 });
+
+// Get contributions since a specific date
+calculateChangesPerUser("owner", "repo", "2023-01-01").then((contributions) => {
+  console.log("Contributions since Jan 1, 2023:", contributions);
+});
+
+// Get contributions between two dates
+calculateChangesPerUser("owner", "repo", "2023-01-01", "2023-12-31").then(
+  (contributions) => {
+    console.log("Contributions in 2023:", contributions);
+  }
+);
 ```
 
 Then run the application:
@@ -63,6 +77,8 @@ Then run the application:
 ```bash
 node index.js
 ```
+
+Date parameters should be provided in a format that JavaScript's Date constructor can parse (e.g., YYYY-MM-DD).
 
 ## Output
 
