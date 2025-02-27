@@ -1,37 +1,30 @@
-# GitHub PR Statistics
+# GitHub PR Contribution Counter
 
-This Node.js application fetches and analyzes pull request statistics from GitHub repositories, including merged PRs and commit statistics per user.
+A TypeScript application that calculates and summarizes code contributions per user across merged pull requests in a GitHub repository.
 
 ## Features
 
-- Fetch merged pull requests from a repository
-- Calculate changes (additions, deletions, total) per user
-- Detailed commit analysis for each pull request
-- Filter pull requests by date range
+- Fetches all merged pull requests from a specified repository
+- Calculates lines added, deleted, and total changes per user
+- Supports filtering by date range
+- Uses GitHub's REST API
+- Written in TypeScript with full type safety
 
 ## Prerequisites
 
-- Node.js (v12 or higher)
-- npm (Node Package Manager)
+- Node.js (v14 or higher recommended)
+- npm
 - GitHub Personal Access Token
 
 ## Setup
 
-1. Clone this repository:
-
-   ```bash
-   git clone https://github.com/nxvafps/gh-api-test.git
-   cd gh-api-test
-   ```
-
+1. Clone the repository
 2. Install dependencies:
-
    ```bash
    npm install
    ```
-
-3. Create a `.env` file in the root directory:
-   ```bash
+3. Create a `.env` file in the root directory with your GitHub token:
+   ```
    GITHUB_PERSONAL_ACCESS_TOKEN=your_token_here
    ```
 
@@ -51,46 +44,55 @@ This Node.js application fetches and analyzes pull request statistics from GitHu
 
 ## Usage
 
-Modify the example usage in `index.js` with your target repository details. You can filter pull requests by date:
+Run the application with:
 
-```javascript
-// Get all contributions
-calculateChangesPerUser("owner", "repo").then((contributions) => {
-  console.log("All time contributions:", contributions);
-});
+```bash
+npm start
+```
 
-// Get contributions since a specific date
-calculateChangesPerUser("owner", "repo", "2023-01-01").then((contributions) => {
-  console.log("Contributions since Jan 1, 2023:", contributions);
-});
+To use in your own code:
 
-// Get contributions between two dates
-calculateChangesPerUser("owner", "repo", "2023-01-01", "2023-12-31").then(
-  (contributions) => {
-    console.log("Contributions in 2023:", contributions);
-  }
+```typescript
+import { calculateChangesPerUser } from "./github-api";
+
+// Basic usage
+calculateChangesPerUser("owner", "repo").then((contributions) =>
+  console.log(contributions)
+);
+
+// With date range
+calculateChangesPerUser("owner", "repo", "2024-01-01", "2024-12-31").then(
+  (contributions) => console.log(contributions)
 );
 ```
 
-Then run the application:
+## Output Format
 
-```bash
-node index.js
+The tool returns an object with user contributions in the following format:
+
+```typescript
+{
+  "username": {
+    additions: number,
+    deletions: number,
+    total: number
+  }
+}
 ```
 
-Date parameters should be provided in a format that JavaScript's Date constructor can parse (e.g., YYYY-MM-DD).
+## Available Scripts
 
-## Output
+- `npm start` - Compiles TypeScript and runs the application
+- `npm run build` - Compiles TypeScript files
 
-The application will output an object containing statistics for each user who has contributed to the repository through merged pull requests, including:
+## Types
 
-- Number of additions
-- Number of deletions
-- Total changes
+The project exports the following TypeScript interfaces:
 
-## Environment Variables
-
-- `GITHUB_PERSONAL_ACCESS_TOKEN`: Your GitHub personal access token
+- `UserContributions` - Contribution statistics per user
+- `PullRequest` - GitHub pull request information
+- `Commit` - Git commit information
+- `CommitDetails` - Detailed commit statistics
 
 ## License
 
