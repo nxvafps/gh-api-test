@@ -1,20 +1,18 @@
 import "dotenv/config";
-import { calculateChangesPerUser, UserContributions } from "./github-api";
+import { calculateChangesPerUser, UserCommitContributions } from "./github-api";
 import cron from "node-cron";
 
 cron.schedule("* * * * *", async () => {
   try {
-    const contributions: UserContributions = await calculateChangesPerUser(
-      "nxvafps",
-      "pr-test-repo"
-    );
+    const contributions: UserCommitContributions =
+      await calculateChangesPerUser("nxvafps", "pr-test-repo");
     console.log(
       `[${new Date().toISOString()}] Contributions per user:`,
       contributions
     );
   } catch (error) {
     console.log(
-      `[${new Date().toISOString()}] Error fetching contributions`,
+      `[${new Date().toISOString()}] Error fetching contributions:`,
       error
     );
   }

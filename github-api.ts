@@ -16,6 +16,7 @@ interface Commit {
   commit: {
     author: {
       name: string;
+      date: string;
     };
   };
 }
@@ -34,6 +35,16 @@ interface UserContributions {
     deletions: number;
     total: number;
   };
+}
+
+interface UserCommitContributions {
+  [username: string]: Array<{
+    additions: number;
+    deletions: number;
+    total: number;
+    commitSha: string;
+    date: string;
+  }>;
 }
 
 const headers = {
@@ -94,14 +105,14 @@ const calculateChangesPerUser = async (
   repo: string,
   fromDate: string | null = null,
   toDate: string | null = null
-): Promise<UserContributions> => {
+): Promise<UserCommitContributions> => {
   const mergedPRs = await fetchMergedPullRequests(
     owner,
     repo,
     fromDate,
     toDate
   );
-  const userContributions: UserContributions = {};
+  const userContributions: UserCommitContributions = {};
 
   for (const pr of mergedPRs) {
     const commits = await fetchCommitsForPullRequest(owner, repo, pr.number);
@@ -111,12 +122,16 @@ const calculateChangesPerUser = async (
       const username = commit.author?.login || commit.commit.author.name;
 
       if (!userContributions[username]) {
-        userContributions[username] = { additions: 0, deletions: 0, total: 0 };
+        userContributions[username] = [];
       }
 
-      userContributions[username].additions += details.stats.additions;
-      userContributions[username].deletions += details.stats.deletions;
-      userContributions[username].total += details.stats.total;
+      userContributions[username].push({
+        additions: details.stats.additions,
+        deletions: details.stats.deletions,
+        total: details.stats.total,
+        commitSha: commit.sha,
+        date: commit.commit.author.date,
+      });
     }
   }
 
@@ -130,4 +145,5 @@ export {
   PullRequest,
   Commit,
   CommitDetails,
+  UserCommitContributions,
 };
